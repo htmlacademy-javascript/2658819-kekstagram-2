@@ -51,12 +51,12 @@ const MESSAGES = [
 /* eslint-disable */
 
 // Генерируем массив из 25 элементов
-const description = Array.from({ length: ARRAY_LENGTH }, () => {
+const getDescription = () => {
   // Выбираем случайный индекс из массива description
   const randomIndex = Math.floor(Math.random() * DESCRIPTIONS.length);
   // Возвращаем элемент с этим случайным индексом
   return DESCRIPTIONS[randomIndex];
-});
+};
 
 //console.log(description);
 const getRandomInteger = ( min, max ) => {
@@ -65,46 +65,48 @@ const getRandomInteger = ( min, max ) => {
 console.log (getRandomInteger(15, 200))
 
 
-const message = Array.from({ length: ARRAY_LENGTH }, () => {
+const getMessage = () => {
   // Выбираем случайный индекс из массива description
   const randomIndex = Math.floor(Math.random() * MESSAGES.length);
   // Возвращаем элемент с этим случайным индексом
   return MESSAGES[randomIndex];
-});
+};
+
+const getName =  () => {
+  // Выбираем случайный индекс из массива description
+  const randomIndex = Math.floor(Math.random() * NAMES.length);
+  // Возвращаем элемент с этим случайным индексом
+  return NAMES[randomIndex];
+};
+
+let continuousCommentsNum = 1;
 
 
-
-const randomName = NAMES
-  .slice() // Создаём копию, чтобы не изменять оригинал
-  .sort(() => Math.random() - 0.5) // Случайная сортировка
-  .slice(0, ARRAY_LENGTH ); // Извлекаем первые 25 элементов
-
-
-const allComments = Array.from({ length: 30*25 }, () => ({}));
-allComments.forEach((obj, index) => {
-  obj.avatars = `img/avatar-${getRandomInteger(1, 6)}.svg`;
-  obj.id = getRandomInteger(0, 30*25);
-  obj.message = message[index];
-  obj.name = randomName[index];
-});
-
-//const comments = allComments
-   //.slice() // Создаём копию, чтобы не изменять оригинал
-   //.sort(() => Math.random() - 0.5) // Случайная сортировка
-   //.slice(0, 30);
-
-
+const getComments = () => {
+  let numberOfComments = getRandomInteger(0, 30);
+  if (numberOfComments > 0) {
+    const allComments = Array.from({ length: numberOfComments }, () => ({}));
+    allComments.forEach((obj) => {
+      obj.avatar = `img/avatar-${getRandomInteger(1, 6)}.svg`;
+      obj.id = continuousCommentsNum;
+      continuousCommentsNum++;
+      obj.message = getMessage();
+      obj.name = getName();
+    });
+    return allComments;
+  }
+  return NaN;
+};
 
 const targetObjects = Array.from({ length: ARRAY_LENGTH }, () => ({}));
 
 targetObjects.forEach((obj, index) => {
     obj.id = index + 1;
     obj.url = `photos/${index + 1}.jpg`;
-    obj.description = description[index];
+    obj.description = getDescription();
     obj.likes = getRandomInteger(15, 200);
-    obj.comments =  allComments.slice()
-                           .sort(() => Math.random() - 0.5)
-                           .slice(0, 30);
+    obj.comments = getComments();
 });
 
 console.log(targetObjects);
+console.log(targetObjects[0].comments);
