@@ -48,46 +48,39 @@ const MESSAGES = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-/* eslint-disable */
+const MIN_LIKES = 15;
+const MAX_LIKES = 200;
 
-// Генерируем массив из 25 элементов
+const MIN_AVATAR = 1;
+const MAX_AVATAR = 6;
+
+const MAX_COMMENTS = 30;
+
 const getDescription = () => {
-  // Выбираем случайный индекс из массива description
   const randomIndex = Math.floor(Math.random() * DESCRIPTIONS.length);
-  // Возвращаем элемент с этим случайным индексом
   return DESCRIPTIONS[randomIndex];
 };
 
-//console.log(description);
-const getRandomInteger = ( min, max ) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-console.log (getRandomInteger(15, 200))
-
+const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const getMessage = () => {
-  // Выбираем случайный индекс из массива description
   const randomIndex = Math.floor(Math.random() * MESSAGES.length);
-  // Возвращаем элемент с этим случайным индексом
   return MESSAGES[randomIndex];
 };
 
-const getName =  () => {
-  // Выбираем случайный индекс из массива description
+const getName = () => {
   const randomIndex = Math.floor(Math.random() * NAMES.length);
-  // Возвращаем элемент с этим случайным индексом
   return NAMES[randomIndex];
 };
 
 let continuousCommentsNum = 1;
 
-
 const getComments = () => {
-  let numberOfComments = getRandomInteger(0, 30);
+  const numberOfComments = getRandomInteger(0, MAX_COMMENTS);
   if (numberOfComments > 0) {
     const allComments = Array.from({ length: numberOfComments }, () => ({}));
     allComments.forEach((obj) => {
-      obj.avatar = `img/avatar-${getRandomInteger(1, 6)}.svg`;
+      obj.avatar = `img/avatar-${getRandomInteger(MIN_AVATAR, MAX_AVATAR)}.svg`;
       obj.id = continuousCommentsNum;
       continuousCommentsNum++;
       obj.message = getMessage();
@@ -95,18 +88,18 @@ const getComments = () => {
     });
     return allComments;
   }
-  return NaN;
+  return [];
 };
 
-const targetObjects = Array.from({ length: ARRAY_LENGTH }, () => ({}));
+const targetPhotoObjects = Array.from({ length: ARRAY_LENGTH }, () => ({}));
 
-targetObjects.forEach((obj, index) => {
-    obj.id = index + 1;
-    obj.url = `photos/${index + 1}.jpg`;
-    obj.description = getDescription();
-    obj.likes = getRandomInteger(15, 200);
-    obj.comments = getComments();
+targetPhotoObjects.forEach((obj, index) => {
+  obj.id = index + 1;
+  obj.url = `photos/${index + 1}.jpg`;
+  obj.description = getDescription();
+  obj.likes = getRandomInteger(MIN_LIKES, MAX_LIKES);
+  obj.comments = getComments();
 });
-
-console.log(targetObjects);
-console.log(targetObjects[0].comments);
+/* eslint-disable */
+console.log(targetPhotoObjects);
+console.log(targetPhotoObjects[24].comments);
