@@ -1,15 +1,7 @@
 
-const arrayLength = 25;
-const id = Array.from({ length: 1000 }, (_, index) => index + 1);
+const ARRAY_LENGTH = 25;
 
-/* eslint-disable */ //console.log(id);
-
-
-const url = Array.from({length: arrayLength}, (_, i) => `photos/${i + 1}.jpg`);
-//console.log(url);
-
-
-const descriptionList = [
+const DESCRIPTIONS = [
   'Селфи (фотография самого себя)',
   'Пейзаж (природа, город)',
   'Животное (изображение питомца или дикого зверя)',
@@ -19,66 +11,7 @@ const descriptionList = [
   'Арт (рисованное изображение)'
 ];
 
-// Генерируем массив из 25 элементов
-const description = Array.from({ length: arrayLength }, () => {
-  // Выбираем случайный индекс из массива description
-  const randomIndex = Math.floor(Math.random() * descriptionList.length);
-  // Возвращаем элемент с этим случайным индексом
-  return descriptionList[randomIndex];
-});
-
-//console.log(description);
-
-
-const min = 15;
-const max = 200;
-
-// Array.from({ length: arrayLength }, mapFn) создает массив заданной длины,
-// а затем применяет mapFn к каждому элементу.
-const likes = Array.from({ length: arrayLength }, () => {
-  // mapFn генерирует и возвращает случайное число
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-});
-
-//console.log(likes);
-
-
-const messageList = [
-  'Всё отлично!',
-  'В целом всё неплохо. Но не всё.',
-  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
-  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
-  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
-];
-
-const message = Array.from({ length: arrayLength }, () => {
-  // Выбираем случайный индекс из массива description
-  const randomIndex = Math.floor(Math.random() * messageList.length);
-  // Возвращаем элемент с этим случайным индексом
-  return messageList[randomIndex];
-});
-
-//console.log(message);
-
-
-
-const randomUniqueElements = id
-  .slice() // Создаём копию, чтобы не изменять оригинал
-  .sort(() => Math.random() - 0.5) // Случайная сортировка
-  .slice(0, 25); // Извлекаем первые 25 элементов
-
-//console.log(randomUniqueElements);
-
-const avatars = Array.from({ length: arrayLength }, () => {
-  // Генерируем случайное число от 1 до 6
-  const randomNumber = Math.floor(Math.random() * 6) + 1;
-
-  // Возвращаем сформированную строку для каждого элемента
-  return `img/avatar-${randomNumber}.svg`;
-});
-
-const namesList = [
+const NAMES = [
   'Олег',
   'Хлоя',
   'Лео',
@@ -106,29 +39,72 @@ const namesList = [
   'Джина'
 ];
 
-const randomName = namesList
+const MESSAGES = [
+  'Всё отлично!',
+  'В целом всё неплохо. Но не всё.',
+  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
+
+/* eslint-disable */
+
+// Генерируем массив из 25 элементов
+const description = Array.from({ length: ARRAY_LENGTH }, () => {
+  // Выбираем случайный индекс из массива description
+  const randomIndex = Math.floor(Math.random() * DESCRIPTIONS.length);
+  // Возвращаем элемент с этим случайным индексом
+  return DESCRIPTIONS[randomIndex];
+});
+
+//console.log(description);
+const getRandomInteger = ( min, max ) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+console.log (getRandomInteger(15, 200))
+
+
+const message = Array.from({ length: ARRAY_LENGTH }, () => {
+  // Выбираем случайный индекс из массива description
+  const randomIndex = Math.floor(Math.random() * MESSAGES.length);
+  // Возвращаем элемент с этим случайным индексом
+  return MESSAGES[randomIndex];
+});
+
+
+
+const randomName = NAMES
   .slice() // Создаём копию, чтобы не изменять оригинал
   .sort(() => Math.random() - 0.5) // Случайная сортировка
-  .slice(0, 25); // Извлекаем первые 25 элементов
+  .slice(0, ARRAY_LENGTH ); // Извлекаем первые 25 элементов
 
 
-const comments = Array.from({ length: arrayLength }, () => ({}));
-comments.forEach((obj, index) => {
-  obj.avatars = avatars[index];
-  obj.id = randomUniqueElements[index];
+const allComments = Array.from({ length: 30*25 }, () => ({}));
+allComments.forEach((obj, index) => {
+  obj.avatars = `img/avatar-${getRandomInteger(1, 6)}.svg`;
+  obj.id = getRandomInteger(0, 30*25);
   obj.message = message[index];
   obj.name = randomName[index];
 });
 
+//const comments = allComments
+   //.slice() // Создаём копию, чтобы не изменять оригинал
+   //.sort(() => Math.random() - 0.5) // Случайная сортировка
+   //.slice(0, 30);
 
-const targetObjects = Array.from({ length: arrayLength }, () => ({}));
+
+
+const targetObjects = Array.from({ length: ARRAY_LENGTH }, () => ({}));
 
 targetObjects.forEach((obj, index) => {
-    obj.id = id[index];
-    obj.url = url[index];
+    obj.id = index + 1;
+    obj.url = `photos/${index + 1}.jpg`;
     obj.description = description[index];
-    obj.likes = likes[index];
-    obj.comments = comments[index];
+    obj.likes = getRandomInteger(15, 200);
+    obj.comments =  allComments.slice()
+                           .sort(() => Math.random() - 0.5)
+                           .slice(0, 30);
 });
 
 console.log(targetObjects);
