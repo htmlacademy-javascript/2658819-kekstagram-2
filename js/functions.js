@@ -1,68 +1,35 @@
-const isNoMore = (myString, givenLength) => (myString.length <= givenLength);
 
-/* eslint-disable */ console.log(isNoMore('Hello World!', 15));
-console.log(isNoMore('проверяемая строка', 20));
-console.log(isNoMore('проверяемая строка', 18));
-console.log(isNoMore('проверяемая строка', 10));
+const convertToMinutes = (timeString) => {
+  // Используется синтаксис деструктуризации массива.
+  // Метод split() разбивает строку на массив подстрок, используя символ ":" в качестве разделителя.
+  // Метод map() создает новый массив, применяя функцию Number к каждому элементу исходного массива. Функция Number преобразует строковое значение в числовое.
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+};
 
+const isMeetingInWorkHours = (workStart, workEnd, meetingStart, meetingDuration) => {
+  const workStartMinutes = convertToMinutes(workStart);
+  const workEndMinutes = convertToMinutes(workEnd);
+  const meetingStartMinutes = convertToMinutes(meetingStart);
+  const meetingEndMinutes = meetingStartMinutes + meetingDuration;
 
-function isPalindrome(myString) {
-  // Приводим строку к нижнему регистру и удаляем небуквенно-цифровые символы
-  const cleanedString = myString.toLowerCase().replace(/[^a-zа-я0-9]/g, '');
-  const reversedString = cleanedString.split('').reverse().join('');
-  return cleanedString === reversedString;
-}
+  return (
+    meetingStartMinutes >= workStartMinutes &&
+    meetingEndMinutes <= workEndMinutes
+  );
+};
 
-console.log(isPalindrome('топот'));
-console.log(isPalindrome('hello world'));
-console.log(isPalindrome('ДовОд'));
-console.log(isPalindrome('Кекс'));
-console.log(isPalindrome('Лёша на полке клопа нашёл '));
+/*
+workStart = '8:00' - начало рабочего дня
+workEnd = '17:30' - конец рабочего дня
+meetingStart = '14:00' - начало встречи
+meetingDuration = 90 - продолжительность встречи в минутах
+*/
+/* eslint-disable */
+console.log(isMeetingInWorkHours('08:00', '17:30', '14:00', 90)); // true
+console.log(isMeetingInWorkHours('8:0', '10:0', '8:0', 120));     // true
+console.log(isMeetingInWorkHours('08:00', '14:30', '14:00', 90)); // false
+console.log(isMeetingInWorkHours('14:00', '17:30', '08:0', 90));  // false
+console.log(isMeetingInWorkHours('8:00', '17:30', '08:00', 900)); // false
 
-
-function extractNumber(myString) {
-  const str = typeof myString === 'number' ? myString.toString() : myString;
-  const extractedString = str.replace(/\D/g, '');
-  return (+extractedString === 0) ? (extractedString/0) : +extractedString;
-}
-
-console.log(extractNumber('2023 год'));
-console.log(extractNumber('ECMAScript 2022'));
-console.log(extractNumber('1 кефир, 0.5 батона'));
-console.log(extractNumber('агент 007'));
-console.log(extractNumber('а я томат'));
-console.log(extractNumber(2023));
-console.log(extractNumber(-1));
-console.log(extractNumber(1.5));
-
-
-function extractDigitsAndGetNumbers(myString) {
-  let digitsString = '';
-  const str = typeof myString === 'number' ? myString.toString() : myString;
-
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    const num = parseInt(char, 10); // Преобразуем символ в число
-
-    // Проверяем, является ли результат числом (не NaN)
-    if (!Number.isNaN(num)) {
-      digitsString += char;
-    }
-  }
-
-  if (digitsString.length === 0) {
-    return NaN; // Если цифр не найдено
-  } else {
-    return parseInt(digitsString, 10); // Преобразуем строку с цифрами в целое число
-  }
-}
-
-console.log(extractDigitsAndGetNumbers('2023 год'));
-console.log(extractDigitsAndGetNumbers('ECMAScript 2022'));
-console.log(extractDigitsAndGetNumbers('1 кефир, 0.5 батона'));
-console.log(extractDigitsAndGetNumbers('агент 007'));
-console.log(extractDigitsAndGetNumbers('а я томат'));
-console.log(extractDigitsAndGetNumbers(2023));
-console.log(extractDigitsAndGetNumbers(-1));
-console.log(extractDigitsAndGetNumbers(1.5));
 
