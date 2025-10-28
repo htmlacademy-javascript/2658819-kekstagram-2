@@ -1,7 +1,13 @@
 
+import { renderPhotos } from './render-photos.js';
 import { generatePhotoData } from './generate-photo-data.js';
-import { picturesContainer } from './thumbnail-renderer.js';
 
-/* eslint-disable */
-console.log(generatePhotoData);
-console.log(picturesContainer);
+renderPhotos(generatePhotoData);
+
+
+
+// document.querySelector(".img-upload__form").addEventListener("click", (e) => {
+//   e.preventDefault();
+//   document.querySelector(".pictures").innerHTML = "";
+//   renderPhotos(generatePhotoData.slice(0, 5));
+// });
