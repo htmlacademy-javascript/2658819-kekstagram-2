@@ -3,12 +3,12 @@
 const pictureTemplate = document.querySelector('#picture').content;
 
 // Получаем контейнер для отрисовки фотографий
-const pictureListElement = document.querySelector('.pictures');
+//const pictureListElement = document.querySelector('.pictures');
 
 // Создаем DocumentFragment для эффективной вставки элементов
 const fragment = document.createDocumentFragment();
 
-const renderPhotos = (photoData) => {
+const renderPhotos = (pictureListElement, photoData) => {
   // Проходим по данным и создаем элементы
   photoData.forEach((photo) => {
     // Клонируем содержимое шаблона (глубокое клонирование, включая дочерние элементы)
