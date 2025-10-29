@@ -41,7 +41,7 @@ generatePhotoData.forEach((obj, index) => {
 });
 
 /* eslint-disable */
-// console.log(generatePhotoData);
-// console.log(generatePhotoData[24].comments);
+ //console.log(generatePhotoData);
+ //console.log(generatePhotoData[24].comments);
 
 export { generatePhotoData };
