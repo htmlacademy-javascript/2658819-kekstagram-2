@@ -1,6 +1,9 @@
 
 import { isEscapeKey, numDecline, toggleClass } from './util.js';
 
+// Количество комментариев, загружаемых за один раз
+const COMMENTS_STEP = 5;
+
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = bigPicture.querySelector('.big-picture__img img');
 const closeButton = bigPicture.querySelector('.big-picture__cancel');
@@ -13,6 +16,7 @@ const socialCommentTemplate = bigPicture.querySelector('.social__comment');
 
 const commentFragment = document.createDocumentFragment();
 
+let commentsCount = COMMENTS_STEP;
 let currentComments = [];
 
 /**
@@ -30,31 +34,36 @@ const toggleModal = () => {
  */
 const createComment = (comment) => {
   const newComment = /** @type {Element} */ socialCommentTemplate.cloneNode(true);
+
   const avatar = newComment.querySelector('.social__picture');
+
   avatar.src = comment.avatar;
   avatar.alt = comment.name;
   newComment.querySelector('.social__text').textContent = comment.message;
+
   return newComment;
 };
 
 /**
- * Отрисовывает все комментарии сразу
+ * Отрисовывает комментарии внутри большой картинки
  */
 const renderComments = () => {
-  socialComments.replaceChildren(); // Очищаем контейнер
+  socialComments.replaceChildren();
 
-  const totalComments = currentComments.length;
+  // Обновление количества отображаемых комментариев, если их меньше чем COMMENTS_STEP
+  const displayedCount = Math.min(commentsCount, currentComments.length);
+  socialCommentsCount.innerHTML = `${displayedCount} из <span class="comments-count">${currentComments.length}</span> ${numDecline(currentComments.length, 'комментария', 'комментария', 'комментариев')}`;
 
-  // Обновляем счетчик, показывая общее количество
-  socialCommentsCount.innerHTML = `${totalComments} из <span class="comments-count">${totalComments}</span> ${numDecline(totalComments, 'комментария', 'комментария', 'комментариев')}`;
+  for (let i = 0; i < displayedCount; i++) {
+    commentFragment.appendChild(createComment(currentComments[i]));
+  }
 
-  // Скрываем кнопку загрузки комментариев, так как все уже показаны
-  loadButton.classList.add('hidden');
-
-  // Добавляем все комментарии во фрагмент
-  currentComments.forEach((comment) => {
-    commentFragment.appendChild(createComment(comment));
-  });
+  // Скрытие кнопки загрузки, если все комментарии показаны
+  if (displayedCount >= currentComments.length) {
+    loadButton.classList.add('hidden');
+  } else {
+    loadButton.classList.remove('hidden');
+  }
 
   socialComments.appendChild(commentFragment);
 };
@@ -70,6 +79,11 @@ const show = (picture) => {
   pictureCaption.textContent = description;
 };
 
+const onLoadCommentsButtonClick = () => {
+  commentsCount += COMMENTS_STEP;
+  renderComments();
+};
+
 function onBigPictureEscKeyDown(evt) {
   if(isEscapeKey(evt)){
     closeBigPicture();
@@ -77,7 +91,7 @@ function onBigPictureEscKeyDown(evt) {
 }
 
 function closeBigPicture() {
-  // Удаляем сброс commentsCount = COMMENTS_STEP;
+  commentsCount = COMMENTS_STEP; // Сброс счетчика при закрытии
   document.removeEventListener('keydown', onBigPictureEscKeyDown);
   toggleModal();
 }
@@ -91,24 +105,21 @@ const onCloseBigPictureClick = () => {
  * @param {Object} picture объект с одной картинкой
  */
 const showBigPicture = (picture) => {
-  if (!picture || !picture.comments) {
-    /* eslint-disable */
-    console.error('Ошибка данных: изображение или комментарии не определены.');
-    return;
-  }
 
-  // Клонируем все комментарии сразу
   currentComments = picture.comments.slice();
 
   show(picture);
+
   renderComments();
 
   document.addEventListener('keydown', onBigPictureEscKeyDown);
+
   toggleModal();
 };
 
-// Удаляем прослушиватель событий loadButton.addEventListener
+loadButton.addEventListener('click', onLoadCommentsButtonClick);
 closeButton.addEventListener ('click', onCloseBigPictureClick);
 
 
 export { showBigPicture };
+

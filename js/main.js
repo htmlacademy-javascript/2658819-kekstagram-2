@@ -7,7 +7,7 @@ import {showBigPicture} from './render-full-size-photo.js';
 renderPhotos(generatePhotoData);
 
 // 2. Добавляем обработчик клика на контейнер
-const galleryContainer = document.querySelector('.pictures'); // Исправлено: ищем .pictures, а не .picture
+const galleryContainer = document.querySelector('.pictures');
 
 galleryContainer.addEventListener('click', (e) => {
   // Ищем ближайший родительский элемент с классом .picture (ссылка <a>)
