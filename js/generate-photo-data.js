@@ -30,18 +30,18 @@ const getComments = () => {
   return [];
 };
 
-const generatePhotoData = Array.from({ length: ARRAY_LENGTH }, () => ({}));
-
-generatePhotoData.forEach((obj, index) => {
-  obj.id = index + 1;
-  obj.url = `photos/${index + 1}.jpg`;
-  obj.description = getArrayElement(DESCRIPTIONS);
-  obj.likes = getRandomInteger(MIN_LIKES, MAX_LIKES);
-  obj.comments = getComments();
+const generatePhotoData = Array.from({ length: ARRAY_LENGTH }, (obj, index) => {
+  const photo = {};
+  photo.id = index + 1;
+  photo.url = `photos/${index + 1}.jpg`;
+  photo.description = getArrayElement(DESCRIPTIONS);
+  photo.likes = getRandomInteger(MIN_LIKES, MAX_LIKES);
+  photo.comments = getComments();
+  return photo;
 });
 
 /* eslint-disable */
- //console.log(generatePhotoData);
- //console.log(generatePhotoData[24].comments);
+ console.log(generatePhotoData);
+ console.log(generatePhotoData[24].comments);
 
 export { generatePhotoData };
