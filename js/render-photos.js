@@ -1,14 +1,16 @@
 
+// import { showBigPicture } from './render-full-size-photo';
+
 // Получаем шаблон по ID. Находим фрагмент с содержимым template.
 const pictureTemplate = document.querySelector('#picture').content;
 
 // Получаем контейнер для отрисовки фотографий
-//const pictureListElement = document.querySelector('.pictures');
+const pictureListElement = document.querySelector('.pictures');
 
 // Создаем DocumentFragment для эффективной вставки элементов
 const fragment = document.createDocumentFragment();
 
-const renderPhotos = (pictureListElement, photoData) => {
+const renderPhotos = (photoData) => {
   // Проходим по данным и создаем элементы
   photoData.forEach((photo) => {
     // Клонируем содержимое шаблона (глубокое клонирование, включая дочерние элементы)
@@ -21,14 +23,15 @@ const renderPhotos = (pictureListElement, photoData) => {
     // Присваиваем текстовому содержимому значение свойства likes и comments из объекта photo
     pictureElement.querySelector('.picture__likes').textContent = photo.likes;
     pictureElement.querySelector('.picture__comments').textContent = photo.comments;
-
+    // *** Добавляем data-атрибут с ID фотографии ***
+    // Обертка .picture в шаблоне — это ссылка <a>.
+    pictureElement.querySelector('.picture').dataset.pictureId = photo.id;
     // Добавляем заполненный элемент во фрагмент
     fragment.appendChild(pictureElement);
   });
-
   // Отрисовываем все сгенерированные DOM-элементы за один раз
   pictureListElement.appendChild(fragment);
 
 };
 
-export { renderPhotos};
+export { renderPhotos };
