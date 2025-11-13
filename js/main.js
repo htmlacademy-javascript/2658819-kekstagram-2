@@ -1,7 +1,7 @@
 
 import { renderPhotos } from './render-photos.js';
 import { generatePhotoData } from './generate-photo-data.js';
-import {showBigPicture} from './render-full-size-photo.js';
+import {showBigPicture} from './showBigPicture.js';
 
 // 1. Отрисовываем маленькие фотографии, передавая данные
 renderPhotos(generatePhotoData);
