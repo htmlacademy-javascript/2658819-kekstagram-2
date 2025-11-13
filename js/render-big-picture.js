@@ -120,6 +120,6 @@ const renderBigPicture = (picture) => {
 loadButton.addEventListener('click', onLoadCommentsButtonClick);
 closeButton.addEventListener ('click', onCloseBigPictureClick);
 
-
+// Переименовали функцию
 export { renderBigPicture };
 
