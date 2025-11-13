@@ -1,7 +1,7 @@
 
 import { renderPhotos } from './render-photos.js';
 import { generatePhotoData } from './generate-photo-data.js';
-import {showBigPicture} from './showBigPicture.js';
+import {renderBigPicture} from './render-big-picture.js';
 
 // 1. Отрисовываем маленькие фотографии, передавая данные
 renderPhotos(generatePhotoData);
@@ -24,7 +24,7 @@ galleryContainer.addEventListener('click', (e) => {
     );
     // 5. Передаем найденный объект в функцию showBigPicture
     if (selectedPhotoData) {
-      showBigPicture(selectedPhotoData);
+      renderBigPicture(selectedPhotoData);
     } else {
       /* eslint-disable */
       console.error('Данные для выбранной фотографии не найдены!');

@@ -104,7 +104,7 @@ const onCloseBigPictureClick = () => {
  * Открывает большую картинку
  * @param {Object} picture объект с одной картинкой
  */
-const showBigPicture = (picture) => {
+const renderBigPicture = (picture) => {
 
   currentComments = picture.comments.slice();
 
@@ -121,5 +121,5 @@ loadButton.addEventListener('click', onLoadCommentsButtonClick);
 closeButton.addEventListener ('click', onCloseBigPictureClick);
 
 
-export { showBigPicture };
+export { renderBigPicture };
 
