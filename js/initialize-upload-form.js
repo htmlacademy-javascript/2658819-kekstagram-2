@@ -38,12 +38,10 @@ const toggleModal = () => {
 };
 
 /**
- * Сбрасывает значение input[type="file"] и полей формы.
+ *  Функция обеспечивает "чистый старт" для формы при каждом её открытии. Сбрасывает значение полей формы.
  */
 const resetImageInputValue = () => {
-  uploadPhotoTriggerElement.value = null;
-  hashtagInputElement.value = '';
-  commentInputElement.value = '';
+  uploadForm.reset();
   // Сбрасываем состояние валидации Pristine при закрытии формы
   if (pristine) {
     pristine.reset();
@@ -58,20 +56,20 @@ const isFocusOnInput = () => (
 // --- Функции валидации (используются Pristine) ---
 
 const validateHashtags = (value) => {
-  if (value.trim() === '') { // Добавлены скобки
+  if (value.trim() === '') {
     return true;
   }
   const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0);
-  if (hashtags.length > MAX_HASHTAG_COUNT) { // Добавлены скобки
+  if (hashtags.length > MAX_HASHTAG_COUNT) {
     return false;
   }
   const uniqueHashtags = new Set();
   for (const tag of hashtags) {
-    if (!HASHTAG_REGEX.test(tag)) { // Добавлены скобки
+    if (!HASHTAG_REGEX.test(tag)) {
       return false;
     }
     const lowerCaseTag = tag.toLowerCase();
-    if (uniqueHashtags.has(lowerCaseTag)) { // Добавлены скобки
+    if (uniqueHashtags.has(lowerCaseTag)) {
       return false;
     }
     uniqueHashtags.add(lowerCaseTag);
@@ -79,6 +77,32 @@ const validateHashtags = (value) => {
   return true;
 };
 
+/**
+* Функция для динамического определения сообщения об ошибке (Аргумент 3 в addValidator).
+*/
+const getHashtagErrorMessage = (value) => {
+  if (value.trim() === '') {
+    return ''; // Если поле пустое, не показываем ошибку
+  }
+  const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0);
+
+  if (hashtags.length > MAX_HASHTAG_COUNT) {
+    return ErrorMessages.MAX_COUNT;
+  }
+
+  const uniqueHashtags = new Set();
+  for (const tag of hashtags) {
+    if (!HASHTAG_REGEX.test(tag)) {
+      return ErrorMessages.INVALID_FORMAT;
+    }
+    const lowerCaseTag = tag.toLowerCase();
+    if (uniqueHashtags.has(lowerCaseTag)) {
+      return ErrorMessages.DUPLICATE;
+    }
+    uniqueHashtags.add(lowerCaseTag);
+  }
+  return ''; // Если ошибок нет, возвращаем пустую строку (Pristine считает это успехом)
+};
 
 const validateComment = (value) => (
   value.length <= MAX_COMMENT_LENGTH
@@ -160,23 +184,7 @@ const initializeUploadForm = () => {
   pristine.addValidator(
     hashtagInputElement,
     validateHashtags,
-    // Функция для динамического определения сообщения об ошибке
-    (value) => {
-      if (value.trim() === '') return '';
-      const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0); // Исправлено arrow-parens
-      if (hashtags.length > MAX_HASHTAG_COUNT) return ErrorMessages.MAX_COUNT;
-      const uniqueHashtags = new Set(); //Создаем пустую коллекцию для уникальных значений.
-      for (const tag of hashtags) {
-        // Если хэштег НЕВАЛИДЕН (метод регулярных выражений test() ):
-        if (!HASHTAG_REGEX.test(tag)) return ErrorMessages.INVALID_FORMAT;
-        // ... проверка формата ...
-        const lowerCaseTag = tag.toLowerCase();
-        // Проверяем, существует ли этот тег (без учета регистра) уже в коллекции
-        if (uniqueHashtags.has(lowerCaseTag)) return ErrorMessages.DUPLICATE;
-        uniqueHashtags.add(lowerCaseTag);
-      }
-      return ''; // Если валидно, возвращаем пустую строку
-    },
+    getHashtagErrorMessage,
     1,
     false
   );
