@@ -1,20 +1,12 @@
 import { isEscapeKey, toggleClass } from './util.js';
-
-// --- Константы валидации ---
-const MAX_HASHTAG_COUNT = 5;
-const MAX_COMMENT_LENGTH = 140;
-
-const HASHTAG_REGEX = /^#[a-zа-я0-9]{1,19}$/i;
-
-
-// --- Сообщения об ошибках для Pristine ---
-const ErrorMessages = {
-  INVALID_FORMAT: 'Неверный формат хэштега (начинается с #, буквы/цифры)',
-  MAX_COUNT: `Нельзя указать больше ${MAX_HASHTAG_COUNT} хэштегов`,
-  DUPLICATE: 'Хэштеги повторяются (нечувствительны к регистру)',
-  COMMENT_LENGTH: `Длина комментария не может составлять больше ${MAX_COMMENT_LENGTH} символов`
-};
-
+import { initializeScale, resetScale } from './scale.js';
+import { initializeEffects, resetEffects } from './effects.js';
+import {
+  MAX_HASHTAG_COUNT,
+  MAX_COMMENT_LENGTH,
+  HASHTAG_REGEX,
+  ErrorMessages
+} from './data/form-constants.js';
 
 // --- Основные элементы DOM ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
@@ -38,12 +30,10 @@ const toggleModal = () => {
 };
 
 /**
- * Сбрасывает значение input[type="file"] и полей формы.
+ *  Функция обеспечивает "чистый старт" для формы при каждом её открытии. Сбрасывает значение полей формы.
  */
 const resetImageInputValue = () => {
-  uploadPhotoTriggerElement.value = null;
-  hashtagInputElement.value = '';
-  commentInputElement.value = '';
+  uploadForm.reset();
   // Сбрасываем состояние валидации Pristine при закрытии формы
   if (pristine) {
     pristine.reset();
@@ -58,20 +48,20 @@ const isFocusOnInput = () => (
 // --- Функции валидации (используются Pristine) ---
 
 const validateHashtags = (value) => {
-  if (value.trim() === '') { // Добавлены скобки
+  if (value.trim() === '') {
     return true;
   }
   const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0);
-  if (hashtags.length > MAX_HASHTAG_COUNT) { // Добавлены скобки
+  if (hashtags.length > MAX_HASHTAG_COUNT) {
     return false;
   }
   const uniqueHashtags = new Set();
   for (const tag of hashtags) {
-    if (!HASHTAG_REGEX.test(tag)) { // Добавлены скобки
+    if (!HASHTAG_REGEX.test(tag)) {
       return false;
     }
     const lowerCaseTag = tag.toLowerCase();
-    if (uniqueHashtags.has(lowerCaseTag)) { // Добавлены скобки
+    if (uniqueHashtags.has(lowerCaseTag)) {
       return false;
     }
     uniqueHashtags.add(lowerCaseTag);
@@ -79,6 +69,32 @@ const validateHashtags = (value) => {
   return true;
 };
 
+/**
+* Функция для динамического определения сообщения об ошибке (Аргумент 3 в addValidator).
+*/
+const getHashtagErrorMessage = (value) => {
+  if (value.trim() === '') {
+    return ''; // Если поле пустое, не показываем ошибку
+  }
+  const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0);
+
+  if (hashtags.length > MAX_HASHTAG_COUNT) {
+    return ErrorMessages.MAX_COUNT;
+  }
+
+  const uniqueHashtags = new Set();
+  for (const tag of hashtags) {
+    if (!HASHTAG_REGEX.test(tag)) {
+      return ErrorMessages.INVALID_FORMAT;
+    }
+    const lowerCaseTag = tag.toLowerCase();
+    if (uniqueHashtags.has(lowerCaseTag)) {
+      return ErrorMessages.DUPLICATE;
+    }
+    uniqueHashtags.add(lowerCaseTag);
+  }
+  return ''; // Если ошибок нет, возвращаем пустую строку (Pristine считает это успехом)
+};
 
 const validateComment = (value) => (
   value.length <= MAX_COMMENT_LENGTH
@@ -92,6 +108,8 @@ const closeModalHandler = (evt) => {
     evt.preventDefault();
   }
   toggleModal();
+  resetScale(); // !!! Вызываем функцию сброса масштаба из scale.js при закрытии !
+  resetEffects(); // !!! Вызываем сброс эффектов при закрытии !!!
   resetImageInputValue();
   document.removeEventListener('keydown', onEscapeKeyDown);
 };
@@ -110,6 +128,8 @@ function onEscapeKeyDown(evt) {
 
 const openModalHandler = () => {
   toggleModal();
+  initializeScale(); // ! Вызываем функцию инициализации масштаба из scale.js при открытии !
+  initializeEffects(); // !!! Вызываем инициализацию эффектов при открытии !!!
   document.addEventListener('keydown', onEscapeKeyDown);
 };
 
@@ -144,7 +164,7 @@ const initializeUploadForm = () => {
   pristine = new Pristine(uploadForm, {
     classTo: 'img-upload__field-wrapper',
     errorTextParent: 'img-upload__field-wrapper',
-    errorTextClass: 'img-upload__error-text',
+    errorTextClass: 'img-upload__field-wrapper--error',
     errorClass: 'has-danger',
     successClass: 'has-success',
   });
@@ -160,23 +180,7 @@ const initializeUploadForm = () => {
   pristine.addValidator(
     hashtagInputElement,
     validateHashtags,
-    // Функция для динамического определения сообщения об ошибке
-    (value) => {
-      if (value.trim() === '') return '';
-      const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0); // Исправлено arrow-parens
-      if (hashtags.length > MAX_HASHTAG_COUNT) return ErrorMessages.MAX_COUNT;
-      const uniqueHashtags = new Set(); //Создаем пустую коллекцию для уникальных значений.
-      for (const tag of hashtags) {
-        // Если хэштег НЕВАЛИДЕН (метод регулярных выражений test() ):
-        if (!HASHTAG_REGEX.test(tag)) return ErrorMessages.INVALID_FORMAT;
-        // ... проверка формата ...
-        const lowerCaseTag = tag.toLowerCase();
-        // Проверяем, существует ли этот тег (без учета регистра) уже в коллекции
-        if (uniqueHashtags.has(lowerCaseTag)) return ErrorMessages.DUPLICATE;
-        uniqueHashtags.add(lowerCaseTag);
-      }
-      return ''; // Если валидно, возвращаем пустую строку
-    },
+    getHashtagErrorMessage,
     1,
     false
   );

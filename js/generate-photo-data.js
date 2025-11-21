@@ -1,5 +1,5 @@
 
-import { DESCRIPTIONS, NAMES, MESSAGES } from './data.js';
+import { DESCRIPTIONS, NAMES, MESSAGES } from './data/data.js';
 import { getRandomInteger, getArrayElement } from './util.js';
 
 const ARRAY_LENGTH = 25;
