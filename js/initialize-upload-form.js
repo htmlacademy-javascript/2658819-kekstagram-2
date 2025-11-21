@@ -1,20 +1,12 @@
 import { isEscapeKey, toggleClass } from './util.js';
-
-// --- Константы валидации ---
-const MAX_HASHTAG_COUNT = 5;
-const MAX_COMMENT_LENGTH = 140;
-
-const HASHTAG_REGEX = /^#[a-zа-я0-9]{1,19}$/i;
-
-
-// --- Сообщения об ошибках для Pristine ---
-const ErrorMessages = {
-  INVALID_FORMAT: 'Неверный формат хэштега (начинается с #, буквы/цифры)',
-  MAX_COUNT: `Нельзя указать больше ${MAX_HASHTAG_COUNT} хэштегов`,
-  DUPLICATE: 'Хэштеги повторяются (нечувствительны к регистру)',
-  COMMENT_LENGTH: `Длина комментария не может составлять больше ${MAX_COMMENT_LENGTH} символов`
-};
-
+import { initializeScale, resetScale } from './scale.js';
+import { initializeEffects, resetEffects } from './effects.js';
+import {
+  MAX_HASHTAG_COUNT,
+  MAX_COMMENT_LENGTH,
+  HASHTAG_REGEX,
+  ErrorMessages
+} from './data/form-constants.js';
 
 // --- Основные элементы DOM ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
@@ -116,6 +108,8 @@ const closeModalHandler = (evt) => {
     evt.preventDefault();
   }
   toggleModal();
+  resetScale(); // !!! Вызываем функцию сброса масштаба из scale.js при закрытии !
+  resetEffects(); // !!! Вызываем сброс эффектов при закрытии !!!
   resetImageInputValue();
   document.removeEventListener('keydown', onEscapeKeyDown);
 };
@@ -134,6 +128,8 @@ function onEscapeKeyDown(evt) {
 
 const openModalHandler = () => {
   toggleModal();
+  initializeScale(); // ! Вызываем функцию инициализации масштаба из scale.js при открытии !
+  initializeEffects(); // !!! Вызываем инициализацию эффектов при открытии !!!
   document.addEventListener('keydown', onEscapeKeyDown);
 };
 
@@ -168,7 +164,7 @@ const initializeUploadForm = () => {
   pristine = new Pristine(uploadForm, {
     classTo: 'img-upload__field-wrapper',
     errorTextParent: 'img-upload__field-wrapper',
-    errorTextClass: 'img-upload__error-text',
+    errorTextClass: 'img-upload__field-wrapper--error',
     errorClass: 'has-danger',
     successClass: 'has-success',
   });
