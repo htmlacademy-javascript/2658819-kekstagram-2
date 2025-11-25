@@ -1,6 +1,9 @@
+
 import { isEscapeKey, toggleClass } from './util.js';
 import { initializeScale, resetScale } from './scale.js';
 import { initializeEffects, resetEffects } from './effects.js';
+import { sendData } from './api.js';
+
 import {
   MAX_HASHTAG_COUNT,
   MAX_COMMENT_LENGTH,
@@ -8,21 +11,73 @@ import {
   ErrorMessages
 } from './data/form-constants.js';
 
-// --- Основные элементы DOM ---
+// --- Элементы DOM и шаблоны ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
 const photoEditFormElement = document.querySelector('.img-upload__overlay');
 const uploadForm = document.querySelector('.img-upload__form');
 const closeButtonElement = document.querySelector('.img-upload__cancel');
-// submitButton больше не нужен, так как мы не блокируем его
+const submitButtonElement = uploadForm.querySelector('.img-upload__submit');
 
 const hashtagInputElement = photoEditFormElement.querySelector('.text__hashtags');
 const commentInputElement = photoEditFormElement.querySelector('.text__description');
 
-let pristine; // Переменная для хранения экземпляра Pristine
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-// --- Вспомогательные функции ---
+// --- Внутреннее состояние ---
+let pristine;
+let activeMessageElement = null;
+
+// --- View Logic (Показ/Скрытие сообщений об отправке) ---
+
 /**
- * Функция toggleModal, использующая внешние переменные.
+ * Удаляет активное сообщение (успех/ошибка) из DOM и убирает обработчик Esc.
+ */
+const removeMessage = () => {
+  if (activeMessageElement) {
+    activeMessageElement.remove();
+    activeMessageElement = null;
+    document.removeEventListener('keydown', onMessageEscapeKeydown);
+  }
+};
+
+/**
+ * Обработчик нажатия Esc для закрытия сообщения об отправке.
+ * @param {KeyboardEvent} evt Событие клавиатуры
+ */
+function onMessageEscapeKeydown(evt) {
+  if (isEscapeKey(evt)) {
+    evt.preventDefault();
+    removeMessage();
+  }
+}
+
+/**
+ * Показывает сообщение на основе переданного шаблона (#success или #error).
+ * Добавляет обработчики закрытия.
+ * @param {HTMLElement} templateElement HTML-шаблон сообщения
+ */
+const showMessage = (templateElement) => {
+  const messageElement = templateElement.cloneNode(true);
+  const closeButton = messageElement.querySelector('button');
+
+  closeButton.addEventListener('click', removeMessage);
+
+  messageElement.addEventListener('click', (evt) => {
+    if (evt.target === messageElement) {
+      removeMessage();
+    }
+  });
+
+  document.addEventListener('keydown', onMessageEscapeKeydown);
+  document.body.appendChild(messageElement);
+  activeMessageElement = messageElement;
+};
+
+// --- Вспомогательные функции Контроллера ---
+
+/**
+ * Функция переключения видимости модального окна и скролла фона.
  */
 const toggleModal = () => {
   toggleClass(photoEditFormElement, 'hidden');
@@ -30,23 +85,32 @@ const toggleModal = () => {
 };
 
 /**
- *  Функция обеспечивает "чистый старт" для формы при каждом её открытии. Сбрасывает значение полей формы.
+ * Сбрасывает значение input[type="file"], очищает поля формы и ошибки Pristine.
  */
 const resetImageInputValue = () => {
   uploadForm.reset();
-  // Сбрасываем состояние валидации Pristine при закрытии формы
   if (pristine) {
     pristine.reset();
   }
 };
 
+/**
+ * Проверяет, находится ли фокус ввода на полях хэштегов или комментария.
+ * @returns {boolean} True, если фокус находится на поле ввода
+ */
 const isFocusOnInput = () => (
   document.activeElement === hashtagInputElement || document.activeElement === commentInputElement
 );
 
 
-// --- Функции валидации (используются Pristine) ---
+// --- Функции Валидации (Разделенная логика) ---
 
+/**
+ * Функция валидации хэштегов. Возвращает true/false для Pristine.
+ * Проверяет формат, количество и уникальность.
+ * @param {string} value Текущее значение поля ввода хэштегов
+ * @returns {boolean} True, если валидация пройдена
+ */
 const validateHashtags = (value) => {
   if (value.trim() === '') {
     return true;
@@ -60,22 +124,24 @@ const validateHashtags = (value) => {
     if (!HASHTAG_REGEX.test(tag)) {
       return false;
     }
-    const lowerCaseTag = tag.toLowerCase();
-    if (uniqueHashtags.has(lowerCaseTag)) {
+    if (uniqueHashtags.has(tag.toLowerCase())) {
       return false;
     }
-    uniqueHashtags.add(lowerCaseTag);
+    uniqueHashtags.add(tag.toLowerCase());
   }
   return true;
 };
 
 /**
-* Функция для динамического определения сообщения об ошибке (Аргумент 3 в addValidator).
-*/
+ * Функция, которая возвращает сообщение об ошибке для Pristine.
+ * @param {string} value Текущее значение поля ввода хэштегов
+ * @returns {string} Текст ошибки или пустая строка
+ */
 const getHashtagErrorMessage = (value) => {
   if (value.trim() === '') {
-    return ''; // Если поле пустое, не показываем ошибку
+    return '';
   }
+
   const hashtags = value.trim().split(/\s+/).filter((tag) => tag.length > 0);
 
   if (hashtags.length > MAX_HASHTAG_COUNT) {
@@ -93,90 +159,115 @@ const getHashtagErrorMessage = (value) => {
     }
     uniqueHashtags.add(lowerCaseTag);
   }
-  return ''; // Если ошибок нет, возвращаем пустую строку (Pristine считает это успехом)
+  return '';
 };
 
+/**
+ * Валидирует длину комментария.
+ * @param {string} value Текущее значение поля ввода комментария
+ * @returns {boolean} True, если длина в пределах лимита
+ */
 const validateComment = (value) => (
   value.length <= MAX_COMMENT_LENGTH
 );
 
 
-// --- Обработчики событий ---
+// --- Обработчики Событий Контроллера ---
 
-const closeModalHandler = (evt) => {
-  if (evt) {
-    evt.preventDefault();
-  }
+/**
+ * Обработчик закрытия модального окна. Сбрасывает все состояния.
+ */
+const closeModalHandler = () => {
   toggleModal();
-  resetScale(); // !!! Вызываем функцию сброса масштаба из scale.js при закрытии !
-  resetEffects(); // !!! Вызываем сброс эффектов при закрытии !!!
+  resetScale();
+  resetEffects();
   resetImageInputValue();
   document.removeEventListener('keydown', onEscapeKeyDown);
 };
 
+/**
+ * Глобальный обработчик нажатий клавиш (вешается на document).
+ * @param {KeyboardEvent} evt Событие клавиатуры
+ */
 function onEscapeKeyDown(evt) {
-  if (isFocusOnInput()) { // <-- Если фокус на инпуте, то условие истинно
-    evt.stopPropagation(); // Останавливаем всплытие события Escape
-    return; // Выходим из обработчика, не закрывая модалку
+  if (isFocusOnInput()) {
+    evt.stopPropagation();
+    return;
   }
-  // ... если условие выше ложно, то доходим сюда и закрываем модалку ...
   if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeModalHandler();
   }
 }
 
+/**
+ * Обработчик открытия модального окна. Инициализирует состояния.
+ */
 const openModalHandler = () => {
   toggleModal();
-  initializeScale(); // ! Вызываем функцию инициализации масштаба из scale.js при открытии !
-  initializeEffects(); // !!! Вызываем инициализацию эффектов при открытии !!!
+  initializeScale();
+  initializeEffects();
   document.addEventListener('keydown', onEscapeKeyDown);
 };
 
 /**
- * Обработчик отправки формы (Submit Handler).
+ * Управляет состоянием кнопки отправки формы (disabled/enabled) для UX.
+ * @param {boolean} isDisabled Флаг блокировки кнопки
+ */
+const toggleSubmitButton = (isDisabled) => {
+  submitButtonElement.disabled = isDisabled;
+  submitButtonElement.textContent = isDisabled ? 'Публикую...' : 'Опубликовать';
+};
+
+
+/**
+ * Обработчик отправки формы (Submit Handler). Асинхронная функция.
+ * Использует sendData из api.js (Модель) через Промисы.
+ * @param {Event} evt Событие отправки формы
  */
 const onFormSubmit = (evt) => {
-  // Проверяем валидацию с помощью Pristine
+  evt.preventDefault();
+
   const isValid = pristine.validate();
 
-  if (!isValid) {
-    // Если форма невалидна, предотвращаем стандартную отправку
-    evt.preventDefault();
-  } else {
-    /* eslint-disable */
-    // Если форма валидна, мы НЕ вызываем preventDefault()
-    // и НЕ вызываем closeModalHandler() здесь.
-    // Браузер выполнит стандартное действие формы (перейдет по адресу action="...").
-    console.log('Форма валидна. Разрешаем стандартную отправку браузером.');
+  if (isValid) {
+    toggleSubmitButton(true);
+
+    sendData(new FormData(uploadForm))
+      .then(() => {
+        closeModalHandler();
+        showMessage(successTemplate);
+      })
+      .catch(() => {
+        showMessage(errorTemplate);
+      })
+      .finally(() => {
+        toggleSubmitButton(false);
+      });
   }
 };
 
+
 // -------------------------------------------------------------------------
-// !!! ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ ДЛЯ MAIN.JS !!!
+// !!! ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ !!!
 // -------------------------------------------------------------------------
 
 /**
  * Инициализирует логику модального окна загрузки фотографии.
+ * Точка входа модуля, вызывается из main.js.
  */
 const initializeUploadForm = () => {
-  // Инициализируем Pristine здесь
   pristine = new Pristine(uploadForm, {
     classTo: 'img-upload__field-wrapper',
     errorTextParent: 'img-upload__field-wrapper',
     errorTextClass: 'img-upload__field-wrapper--error',
-    errorClass: 'has-danger',
     successClass: 'has-success',
   });
 
-  // --- Настройка основных обработчиков событий ---
   uploadPhotoTriggerElement.addEventListener('change', openModalHandler);
   closeButtonElement.addEventListener('click', closeModalHandler);
   uploadForm.addEventListener('submit', onFormSubmit);
 
-  // --- Добавление пользовательских валидаторов в Pristine ---
-
-  // Добавляем правило для хэштегов (с разными сообщениями об ошибках)
   pristine.addValidator(
     hashtagInputElement,
     validateHashtags,
@@ -185,7 +276,6 @@ const initializeUploadForm = () => {
     false
   );
 
-  // Добавляем правило для комментария:
   pristine.addValidator(
     commentInputElement,
     validateComment,
