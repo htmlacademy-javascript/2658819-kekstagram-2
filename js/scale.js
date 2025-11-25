@@ -18,8 +18,15 @@ const imagePreviewElement = document.querySelector('.img-upload__preview img');
  */
 const applyScale = (value) => {
   // Обновляем текстовое поле формы, которое доступно только для чтения (readonly).
-  scaleControlValue.value = `${value}%`; // Доступ к свойству value HTML-элемента <input type="text"> для обновления его содержимого
+  // Доступ к свойству value HTML-элемента <input type="text"> для обновления его содержимого
 
+  const formattedValue = `${value}%`;
+
+  // --- ЭТА СТРОКА МЕНЯЕТ ТЕКУЩЕЕ СВОЙСТВО (ОСНОВНАЯ ЛОГИКА) ---
+  scaleControlValue.value = formattedValue;
+
+  // --- ЭТА СТРОКА ПРИНУДИТЕЛЬНО МЕНЯЕТ HTML-АТРИБУТ (ДЛЯ DEVTOOLS) ---
+  scaleControlValue.setAttribute('value', formattedValue);
   // Применяем CSS transform: scale() к элементу изображения.
   // Делим значение на 100, чтобы получить десятичную дробь (например, 0.75).
   imagePreviewElement.style.transform = `scale(${value / 100})`;

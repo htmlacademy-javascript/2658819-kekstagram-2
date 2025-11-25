@@ -1,6 +1,4 @@
 
-// import { showBigPicture } from './render-full-size-photo';
-
 // Получаем шаблон по ID. Находим фрагмент с содержимым template.
 const pictureTemplate = document.querySelector('#picture').content;
 
