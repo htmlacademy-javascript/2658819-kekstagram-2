@@ -45,5 +45,38 @@ const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
   }
 };
 
-export { getRandomInteger, getArrayElement, toggleClass, closeOnEscKeyDown, numDecline, isEscapeKey };
+/**
+* Выбирает N уникальных случайных элементов из массива.
+* @param {Array<Object>} array Исходный массив
+* @param {number} count Количество уникальных элементов для выбора
+* @returns {Array<Object>} Новый массив с уникальными случайными элементами
+*/
+const getUniqueRandomElements = (array, count) => {
+  const uniqueRandomElements = new Set();
+  // Работаем с копией массива, чтобы не менять исходный и использовать splice
+  const arrayCopy = array.slice();
+
+  while (uniqueRandomElements.size < count && arrayCopy.length > 0) {
+    const randomIndex = Math.floor(Math.random() * arrayCopy.length);
+    // splice удаляет элемент из копии и возвращает его в массиве [element]
+    // add принимает сам element, поэтому берем первый элемент из массива от splice
+    uniqueRandomElements.add(arrayCopy.splice(randomIndex, 1)[0]);
+  }
+  return Array.from(uniqueRandomElements);
+};
+
+/**
+ * Устранение дребезга (Debounce).
+ * Запускает функцию только через timeout после последнего вызова.
+ */
+const debounce = (callback, timeoutDelay) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
+
+export { getRandomInteger, getArrayElement, toggleClass, closeOnEscKeyDown, numDecline, isEscapeKey, getUniqueRandomElements, debounce };
 

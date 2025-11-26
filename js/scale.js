@@ -22,10 +22,10 @@ const applyScale = (value) => {
 
   const formattedValue = `${value}%`;
 
-  // --- ЭТА СТРОКА МЕНЯЕТ ТЕКУЩЕЕ СВОЙСТВО (ОСНОВНАЯ ЛОГИКА) ---
+  // --- МЕНЯЕТ ТЕКУЩЕЕ СВОЙСТВО (ОСНОВНАЯ ЛОГИКА) ---
   scaleControlValue.value = formattedValue;
 
-  // --- ЭТА СТРОКА ПРИНУДИТЕЛЬНО МЕНЯЕТ HTML-АТРИБУТ (ДЛЯ DEVTOOLS) ---
+  // --- ПРИНУДИТЕЛЬНО МЕНЯЕТ HTML-АТРИБУТ (ДЛЯ DEVTOOLS) ---
   scaleControlValue.setAttribute('value', formattedValue);
   // Применяем CSS transform: scale() к элементу изображения.
   // Делим значение на 100, чтобы получить десятичную дробь (например, 0.75).
