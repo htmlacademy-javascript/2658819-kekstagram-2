@@ -1,5 +1,5 @@
 
-// --- Константы API (Замените на актуальные адреса из вашего ТЗ) ---
+// --- Константы API  ---
 const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
 const ENDPOINTS = {
   GET_DATA: `${BASE_URL}/data`,

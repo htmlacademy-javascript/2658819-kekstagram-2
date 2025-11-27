@@ -8,12 +8,15 @@ import {
   MAX_HASHTAG_COUNT,
   MAX_COMMENT_LENGTH,
   HASHTAG_REGEX,
-  ErrorMessages
+  ErrorMessages,
+  FILE_TYPES
 } from './data/form-constants.js';
+
 
 // --- Элементы DOM и шаблоны ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
 const photoEditFormElement = document.querySelector('.img-upload__overlay');
+const imagePreviewElement = document.querySelector('.img-upload__preview img');
 const uploadForm = document.querySelector('.img-upload__form');
 const closeButtonElement = document.querySelector('.img-upload__cancel');
 const submitButtonElement = uploadForm.querySelector('.img-upload__submit');
@@ -114,6 +117,8 @@ const validateComment = (value) => (
 );
 
 // --- Основные Обработчики Событий Контроллера  ---
+// Используем function declaration для closeModalHandler и onEscapeKeyDown,
+// так как они используются внутри логики View Logic/Handlers.
 
 /**
  * Обработчик закрытия модального окна. Сбрасывает все состояния.
@@ -138,16 +143,6 @@ function onEscapeKeyDown(evt) {
     closeModalHandler();
   }
 }
-
-/**
- * Обработчик открытия модального окна. Инициализирует состояния.
- */
-const openModalHandler = () => {
-  toggleModal();
-  initializeScale();
-  initializeEffects();
-};
-
 
 // --- View Logic (Показ/Скрытие сообщений об отправке) ---
 
@@ -204,6 +199,39 @@ const showMessage = (templateElement) => {
   }
 };
 
+/**
+ * Обрабатывает загруженный файл и показывает его в окне превью.
+ */
+const renderUploadImage = () => {
+  const file = uploadPhotoTriggerElement.files[0]; // Получаем первый выбранный файл
+  const fileName = file.name.toLowerCase();
+
+  // Проверяем, соответствует ли расширение файла разрешенным типам
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    // FileReader API позволяет читать содержимое файла асинхронно
+    const reader = new FileReader();
+
+    // Когда файл будет прочитан, устанавливаем его как источник изображения
+    reader.addEventListener('load', () => {
+      imagePreviewElement.src = reader.result;
+    });
+
+    // Начинаем чтение файла как URL данных (Base64)
+    reader.readAsDataURL(file);
+  }
+};
+
+/**
+ * Обработчик открытия модального окна. Инициализирует состояния.
+ */
+const openModalHandler = () => {
+  renderUploadImage();
+  toggleModal();
+  initializeScale();
+  initializeEffects();
+};
 
 /**
  * Управляет состоянием кнопки отправки формы (disabled/enabled) для UX.
@@ -235,7 +263,6 @@ const onFormSubmit = (evt) => {
       });
   }
 };
-
 
 // -------------------------------------------------------------------------
 // !!! ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ !!!

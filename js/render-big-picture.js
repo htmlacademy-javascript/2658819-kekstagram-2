@@ -154,12 +154,9 @@ function renderBigPicture(picture) {
   // Добавляем слушатели при открытии
   document.addEventListener('keydown', onBigPictureEscKeyDown);
   closeButton.addEventListener ('click', onCloseBigPictureClick);
-  // loadButton.addEventListener управляется внутри renderComments
 
   toggleModal();
 }
-
-// !!! Важно: в конце модуля нет висячих addEventListener, все управляется динамически !!!
 
 export { renderBigPicture };
 

@@ -52,7 +52,9 @@ const debouncedApplyFilter = debounce(applyFilter, FILTER_TIMEOUT);
  * @param {Array<Object>} photosData Исходный массив фотографий
  */
 const initializeFilters = (photosData) => {
+  // Реализуем принцип делегирования, обработчик вешается на РОДИТЕЛЬСКИЙ контейнер (filtersContainer)
   filtersContainer.addEventListener('click', (evt) => {
+    // Используем evt.target для определения, на какую кнопку кликнули
     const targetId = evt.target.id;
     let filterFunction = filterByDefault; // Фильтр по умолчанию
 
