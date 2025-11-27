@@ -6,9 +6,6 @@ const FILTER_TIMEOUT = 500; // Таймаут 0.5 секунды для устр
 const RANDOM_PHOTOS_COUNT = 10;
 
 const filtersContainer = document.querySelector('.img-filters');
-// const defaultFilterButton = filtersContainer.querySelector('#filter-default');
-// const randomFilterButton = filtersContainer.querySelector('#filter-random');
-// const discussedFilterButton = filtersContainer.querySelector('#filter-discussed');
 
 /**
  * Удаляет все текущие фотографии из галереи перед отрисовкой новых.
