@@ -26,6 +26,14 @@ const closeOnEscKeyDown = (evt, cb) => {
   }
 };
 
+/**
+ * Склоняет существительное в зависимости от числительного (например, 1 комментарий, 2 комментария, 5 комментариев).
+ * @param {number} num Число, определяющее форму склонения.
+ * @param {string} nominative Именительный падеж (например, "комментарий").
+ * @param {string} genitiveSingular Родительный падеж, единственное число (например, "комментария").
+ * @param {string} genitivePlural Родительный падеж, множественное число (например, "комментариев").
+ * @returns {string} Правильная форма слова.
+ */
 const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
   // Учитываем остаток от деления на 100 для чисел 11-14
   if (num % 100 >= 11 && num % 100 <= 14) {
@@ -78,5 +86,12 @@ const debounce = (callback, timeoutDelay) => {
 };
 
 
-export { getRandomInteger, getArrayElement, toggleClass, closeOnEscKeyDown, numDecline, isEscapeKey, getUniqueRandomElements, debounce };
+export { getRandomInteger,
+  getArrayElement,
+  toggleClass,
+  closeOnEscKeyDown,
+  numDecline,
+  isEscapeKey,
+  getUniqueRandomElements,
+  debounce };
 

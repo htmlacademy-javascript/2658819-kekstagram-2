@@ -5,7 +5,7 @@ const MIN_SCALE = 25; // Минимальный масштаб в процент
 const MAX_SCALE = 100; // Максимальный масштаб в процентах
 const DEFAULT_SCALE = 100; // Масштаб по умолчанию
 
-// --- DOM элементы, которые понадобятся ---
+// --- DOM элементы ---
 const scaleControlSmaller = document.querySelector('.scale__control--smaller');
 const scaleControlBigger = document.querySelector('.scale__control--bigger');
 const scaleControlValue = document.querySelector('.scale__control--value');
@@ -87,8 +87,7 @@ const initializeScale = () => {
 const resetScale = () => {
   scaleControlSmaller.removeEventListener('click', onSmallerButtonClick);
   scaleControlBigger.removeEventListener('click', onBiggerButtonClick);
-  // Визуальный сброс масштаба, хотя resetImageInputValue() может это дублировать
-  applyScale(DEFAULT_SCALE);
+  // Визуальный сброс масштаба происходит в resetImageInputValue()
 };
 
 // Экспортируем функции для использования в upload-form.js
