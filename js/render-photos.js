@@ -20,7 +20,8 @@ const renderPhotos = (photoData) => {
     imgElement.alt = photo.description;
     // Присваиваем текстовому содержимому значение свойства likes и comments из объекта photo
     pictureElement.querySelector('.picture__likes').textContent = photo.likes;
-    pictureElement.querySelector('.picture__comments').textContent = photo.comments;
+    // pictureElement.querySelector('.picture__comments').textContent = photo.comments;
+    pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
     // *** Добавляем data-атрибут с ID фотографии ***
     // Обертка .picture в шаблоне — это ссылка <a>.
     pictureElement.querySelector('.picture').dataset.pictureId = photo.id;
