@@ -60,6 +60,8 @@ const initializeFilters = (photosData) => {
       .classList.remove('img-filters__button--active');
     evt.target.classList.add('img-filters__button--active');
 
+    evt.stopPropagation();
+
     // Определяем нужную функцию фильтрации
     switch (targetId) {
       case 'filter-random':

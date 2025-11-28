@@ -3,7 +3,6 @@ import { isEscapeKey, toggleClass } from './util.js';
 import { initializeScale, resetScale } from './scale.js';
 import { initializeEffects, resetEffects } from './effects.js';
 import { sendData } from './api.js';
-
 import {
   MAX_HASHTAG_COUNT,
   MAX_COMMENT_LENGTH,
@@ -12,7 +11,6 @@ import {
   FILE_TYPES
 } from './data/form-constants.js';
 
-
 // --- Элементы DOM и шаблоны ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
 const photoEditFormElement = document.querySelector('.img-upload__overlay');
@@ -20,6 +18,8 @@ const imagePreviewElement = document.querySelector('.img-upload__preview img');
 const uploadForm = document.querySelector('.img-upload__form');
 const closeButtonElement = document.querySelector('.img-upload__cancel');
 const submitButtonElement = uploadForm.querySelector('.img-upload__submit');
+
+const effectsPreviewElements = document.querySelectorAll('.effects__preview');
 
 const hashtagInputElement = photoEditFormElement.querySelector('.text__hashtags');
 const commentInputElement = photoEditFormElement.querySelector('.text__description');
@@ -124,6 +124,7 @@ const validateComment = (value) => (
  * Обработчик закрытия модального окна. Сбрасывает все состояния.
  */
 function closeModalHandler() {
+  document.removeEventListener('keydown', onEscapeKeyDown);
   toggleModal();
   resetScale();
   resetEffects();
@@ -202,31 +203,56 @@ const showMessage = (templateElement) => {
 /**
  * Обрабатывает загруженный файл и показывает его в окне превью.
  */
+// const renderUploadImage = () => {
+//   const file = uploadPhotoTriggerElement.files[0]; // Получаем первый выбранный файл
+//   const fileName = file.name.toLowerCase();
+//
+//   // Проверяем, соответствует ли расширение файла разрешенным типам
+//   const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+//
+//   if (matches) {
+//     // FileReader API позволяет читать содержимое файла асинхронно
+//     const reader = new FileReader();
+//
+//     // Когда файл будет прочитан, устанавливаем его как источник изображения
+//     reader.addEventListener('load', () => {
+//       imagePreviewElement.src = reader.result;
+//     });
+//
+//     // Начинаем чтение файла как URL данных (Base64)
+//     reader.readAsDataURL(file);
+//   }
+// };
 const renderUploadImage = () => {
   const file = uploadPhotoTriggerElement.files[0]; // Получаем первый выбранный файл
-  const fileName = file.name.toLowerCase();
 
-  // Проверяем, соответствует ли расширение файла разрешенным типам
-  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+  if (file) {
+    const fileName = file.name.toLowerCase();
 
-  if (matches) {
-    // FileReader API позволяет читать содержимое файла асинхронно
-    const reader = new FileReader();
+    // Проверяем, соответствует ли расширение файла разрешенным типам
+    const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
 
-    // Когда файл будет прочитан, устанавливаем его как источник изображения
-    reader.addEventListener('load', () => {
-      imagePreviewElement.src = reader.result;
-    });
+    if (matches) {
+      // !!! ИСПОЛЬЗУЕМ URL.createObjectURL ВМЕСТО FileReader API !!!
+      const imageUrl = URL.createObjectURL(file);
 
-    // Начинаем чтение файла как URL данных (Base64)
-    reader.readAsDataURL(file);
+      // 1. Обновляем основное изображение превью
+      imagePreviewElement.src = imageUrl;
+
+      // 2. Обновляем все превью эффектов CSS background-image !!!
+      effectsPreviewElements.forEach((preview) => {
+        preview.style.backgroundImage = `url('${imageUrl}')`;
+      });
+    }
   }
 };
+
 
 /**
  * Обработчик открытия модального окна. Инициализирует состояния.
  */
 const openModalHandler = () => {
+  document.addEventListener('keydown', onEscapeKeyDown);
   renderUploadImage();
   toggleModal();
   initializeScale();
@@ -247,6 +273,7 @@ const toggleSubmitButton = (isDisabled) => {
 const onFormSubmit = (evt) => {
   evt.preventDefault();
   const isValid = pristine.validate();
+  // const isValid = true;
 
   if (isValid) {
     toggleSubmitButton(true);
@@ -256,18 +283,17 @@ const onFormSubmit = (evt) => {
         showMessage(successTemplate);
       })
       .catch(() => {
-        showMessage(errorTemplate);
+        setTimeout(() => showMessage(errorTemplate), 50);
+        // showMessage(errorTemplate);
       })
       .finally(() => {
         toggleSubmitButton(false);
       });
   }
 };
-
 // -------------------------------------------------------------------------
 // !!! ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ !!!
 // -------------------------------------------------------------------------
-
 const initializeUploadForm = () => {
   pristine = new Pristine(uploadForm, {
     classTo: 'img-upload__field-wrapper',
@@ -297,6 +323,5 @@ const initializeUploadForm = () => {
     false
   );
 };
-
 
 export { initializeUploadForm };

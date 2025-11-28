@@ -60,7 +60,9 @@ function renderComments() {
   socialComments.replaceChildren();
 
   const displayedCount = Math.min(commentsCount, currentComments.length);
-  socialCommentsCount.innerHTML = `${displayedCount} из <span class="comments-count">${currentComments.length}</span> ${numDecline(currentComments.length, 'комментария', 'комментария', 'комментариев')}`;
+  // socialCommentsCount.innerHTML = `${displayedCount} из <span class="comments-count">${currentComments.length}</span> ${numDecline(currentComments.length, 'комментария', 'комментария', 'комментариев')}`;
+  // socialCommentsCount.innerHTML = `<span class="social__comment-shown-count">${displayedCount}</span> из <span class="comments-count">${currentComments.length}</span> ${numDecline(currentComments.length, 'комментария', 'комментария', 'комментариев')}`;
+  socialCommentsCount.innerHTML = `<span class="social__comment-shown-count">${displayedCount}</span> из <span class="social__comment-total-count">${currentComments.length}</span> ${numDecline(currentComments.length, 'комментария', 'комментария', 'комментариев')}`;
 
   for (let i = 0; i < displayedCount; i++) {
     commentFragment.appendChild(createComment(currentComments[i]));
