@@ -90,5 +90,4 @@ const resetScale = () => {
   // Визуальный сброс масштаба происходит в resetImageInputValue()
 };
 
-// Экспортируем функции для использования в upload-form.js
 export { initializeScale, resetScale };

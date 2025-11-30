@@ -84,17 +84,6 @@ const debounce = (callback, timeoutDelay) => {
     timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
   };
 };
-// const debounce = (callback, timeoutDelay) => {
-//   let timeoutId;
-//   return (...rest) => {
-//     // Используем cancelAnimationFrame и requestAnimationFrame
-//     cancelAnimationFrame(timeoutId);
-//     timeoutId = requestAnimationFrame(() => {
-//       // Здесь мы все еще используем setTimeout для задержки в 500мс
-//       setTimeout(() => callback.apply(this, rest), timeoutDelay);
-//     });
-//   };
-// };
 
 export { getRandomInteger,
   getArrayElement,

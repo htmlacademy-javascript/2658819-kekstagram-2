@@ -1,9 +1,43 @@
 
 import { renderPhotos } from './render-photos.js';
-import { initializeUploadForm } from './initialize-upload-form.js';
+import { initializeUploadForm, closeModalHandler as closeUploadForm, isMessageActive, closeActiveMessage, isFocusOnInput } from './initialize-upload-form.js';
 import { initializeGallery } from './initialize-gallery.js';
-import { loadData } from './api.js'; // Импортируем функцию, возвращающую промис
+import { loadData } from './api.js';
 import { initializeFilters } from './initialize-filters.js';
+import { closeBigPicture, getIsBigPictureActive } from './render-big-picture.js';
+import { isEscapeKey } from './util.js';
+
+// !!! ЦЕНТРАЛЬНЫЙ ДИСПЕТЧЕР ESCAPE !!!
+document.addEventListener('keydown', (evt) => {
+  if (isEscapeKey(evt)) {
+    // 1. Приоритет #1: Активно ли сообщение (успех/ошибка)?
+    if (isMessageActive()) {
+      closeActiveMessage();
+      evt.preventDefault();
+      return;
+    }
+
+    // 2. Если фокус на инпутах, игнорируем Esc.
+    if (isFocusOnInput()) {
+      return; // Ничего не делаем, форма НЕ закрывается
+    }
+
+    // 3. Если форма загрузки открыта, закрываем её.
+    const uploadOverlay = document.querySelector('.img-upload__overlay');
+    if (uploadOverlay && !uploadOverlay.classList.contains('hidden')) {
+      closeUploadForm();
+      evt.preventDefault();
+      return;
+    }
+
+    // 4. Активна ли большая картинка?
+    if (getIsBigPictureActive()) {
+      closeBigPicture();
+      evt.preventDefault();
+    }
+  }
+});
+
 
 /**
  * Функция инициализации приложения с использованием промисов
@@ -11,7 +45,6 @@ import { initializeFilters } from './initialize-filters.js';
 const init = () => {
   loadData()
     .then((photosData) => {
-      // Этот блок выполнится ТОЛЬКО после успешной загрузки данных
       renderPhotos(photosData);
       initializeGallery(photosData);
       document.querySelector('.img-filters').classList.remove('img-filters--inactive');
@@ -19,13 +52,10 @@ const init = () => {
     })
     .catch((error) => {
       /* eslint-disable no-console */
-      // Этот блок выполнится, если в loadData() произошла ошибка (catch сработал)
       console.error('Не удалось инициализировать приложение:', error);
     });
 };
 
 // --- Запуск приложения ---
 init();
-
-// Инициализируем форму загрузки
 initializeUploadForm();
