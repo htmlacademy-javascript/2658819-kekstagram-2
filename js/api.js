@@ -1,8 +1,8 @@
 
 // --- Константы API  ---
-const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
+const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram/';
 const ENDPOINTS = {
-  GET_DATA: `${BASE_URL}/data`,
+  GET_DATA: `${BASE_URL}data`,
   SEND_DATA: `${BASE_URL}`
 };
 

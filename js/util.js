@@ -85,7 +85,6 @@ const debounce = (callback, timeoutDelay) => {
   };
 };
 
-
 export { getRandomInteger,
   getArrayElement,
   toggleClass,
