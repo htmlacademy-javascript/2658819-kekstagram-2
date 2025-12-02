@@ -33,8 +33,6 @@ const loadData = () =>
         : response.json()
     )
     .catch((error) => {
-      /* eslint-disable no-console */
-      console.error(error.message);
       showDataError();
       throw error;
     });
@@ -55,10 +53,7 @@ const sendData = (formData) =>
         ? Promise.reject(new Error(`Ошибка отправки данных: ${response.status} ${response.statusText}`))
         : response
     )
-    .catch((error) => {
-      // Здесь фигурные скобки остаются, так как внутри более одного выражения
-      console.error(error.message);
-      throw error;
+    .catch(() => {
     });
 
 export { loadData, sendData };

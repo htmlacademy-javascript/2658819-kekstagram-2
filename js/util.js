@@ -1,12 +1,4 @@
 
-
-const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-const getArrayElement = (array) => {
-  const randomIndex = Math.floor(Math.random() * array.length);
-  return array[randomIndex];
-};
-
 const toggleClass = (element, className = '') => {
   if (element) {
     element.classList.toggle(className);
@@ -35,12 +27,9 @@ const closeOnEscKeyDown = (evt, cb) => {
  * @returns {string} Правильная форма слова.
  */
 const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
-  // Учитываем остаток от деления на 100 для чисел 11-14
   if (num % 100 >= 11 && num % 100 <= 14) {
     return genitivePlural;
   }
-
-  // Учитываем остаток от деления на 10
   switch (num % 10) {
     case 1:
       return nominative;
@@ -61,13 +50,10 @@ const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
 */
 const getUniqueRandomElements = (array, count) => {
   const uniqueRandomElements = new Set();
-  // Работаем с копией массива, чтобы не менять исходный и использовать splice
   const arrayCopy = array.slice();
 
   while (uniqueRandomElements.size < count && arrayCopy.length > 0) {
     const randomIndex = Math.floor(Math.random() * arrayCopy.length);
-    // splice удаляет элемент из копии и возвращает его в массиве [element]
-    // add принимает сам element, поэтому берем первый элемент из массива от splice
     uniqueRandomElements.add(arrayCopy.splice(randomIndex, 1)[0]);
   }
   return Array.from(uniqueRandomElements);
@@ -85,12 +71,11 @@ const debounce = (callback, timeoutDelay) => {
   };
 };
 
-export { getRandomInteger,
-  getArrayElement,
+export {
   toggleClass,
   closeOnEscKeyDown,
   numDecline,
   isEscapeKey,
   getUniqueRandomElements,
-  debounce };
-
+  debounce
+};
