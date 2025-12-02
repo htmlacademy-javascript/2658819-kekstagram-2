@@ -9,6 +9,7 @@ const DESCRIPTIONS = [
   'Арт (рисованное изображение)'
 ];
 
+
 const NAMES = [
   'Олег',
   'Хлоя',
