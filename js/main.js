@@ -19,7 +19,7 @@ document.addEventListener('keydown', (evt) => {
 
     // 2. Если фокус на инпутах, игнорируем Esc.
     if (isFocusOnInput()) {
-      return; // Ничего не делаем, форма НЕ закрывается
+      return;
     }
 
     // 3. Если форма загрузки открыта, закрываем её.
@@ -50,9 +50,7 @@ const init = () => {
       document.querySelector('.img-filters').classList.remove('img-filters--inactive');
       initializeFilters(photosData);
     })
-    .catch((error) => {
-      /* eslint-disable no-console */
-      console.error('Не удалось инициализировать приложение:', error);
+    .catch(() => {
     });
 };
 

@@ -41,7 +41,11 @@ const applyFilter = (filterFunction, photosData) => {
   renderPhotos(filteredPhotos);
 };
 
-// Создаем "отложенную" функцию применения фильтра с задержкой 0.5с
+/**
+* Отложенная версия функции applyFilter, которая гарантирует, что отрисовка фильтров
+* будет происходить не чаще, чем один раз в FILTER_TIMEOUT миллисекунд (500 мс).
+* Используется для оптимизации производительности при быстром переключении фильтров.
+*/
 const debouncedApplyFilter = debounce(applyFilter, FILTER_TIMEOUT);
 
 /**
@@ -49,20 +53,13 @@ const debouncedApplyFilter = debounce(applyFilter, FILTER_TIMEOUT);
  * @param {Array<Object>} photosData Исходный массив фотографий
  */
 const initializeFilters = (photosData) => {
-  // Реализуем принцип делегирования, обработчик вешается на РОДИТЕЛЬСКИЙ контейнер (filtersContainer)
   filtersContainer.addEventListener('click', (evt) => {
-    // Используем evt.target для определения, на какую кнопку кликнули
     const targetId = evt.target.id;
-    let filterFunction = filterByDefault; // Фильтр по умолчанию
-
-    // Убираем активный класс у всех кнопок и добавляем к текущей
+    let filterFunction;
     filtersContainer.querySelector('.img-filters__button--active')
       .classList.remove('img-filters__button--active');
     evt.target.classList.add('img-filters__button--active');
-
     evt.stopPropagation();
-
-    // Определяем нужную функцию фильтрации
     switch (targetId) {
       case 'filter-random':
         filterFunction = filterByRandom;
@@ -75,8 +72,6 @@ const initializeFilters = (photosData) => {
         filterFunction = filterByDefault;
         break;
     }
-
-    // Вызываем отложенную функцию (сработает через 0.5с после последнего клика)
     debouncedApplyFilter(filterFunction, photosData);
   });
 };

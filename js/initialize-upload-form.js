@@ -14,11 +14,11 @@ import {
 // --- Элементы DOM и шаблоны ---
 const uploadPhotoTriggerElement = document.querySelector('.img-upload__input');
 const photoEditFormElement = document.querySelector('.img-upload__overlay');
-const imagePreviewElement = document.querySelector('.img-upload__preview img');
 const uploadForm = document.querySelector('.img-upload__form');
-const closeButtonElement = document.querySelector('.img-upload__cancel');
 const submitButtonElement = uploadForm.querySelector('.img-upload__submit');
-const effectsPreviewElements = document.querySelectorAll('.effects__preview');
+const imagePreviewElement = photoEditFormElement.querySelector('.img-upload__preview img');
+const closeButtonElement = photoEditFormElement.querySelector('.img-upload__cancel');
+const effectsPreviewElements = photoEditFormElement.querySelectorAll('.effects__preview');
 
 const hashtagInputElement = photoEditFormElement.querySelector('.text__hashtags');
 const commentInputElement = photoEditFormElement.querySelector('.text__description');
@@ -243,19 +243,9 @@ function initializeUploadForm() {
   uploadPhotoTriggerElement.addEventListener('change', openModalHandler);
   closeButtonElement.addEventListener('click', closeModalHandler);
   uploadForm.addEventListener('submit', onFormSubmit);
-
-  // Добавляем правила валидации Pristine
   pristine.addValidator(hashtagInputElement, validateHashtags, getHashtagErrorMessage, 1, false);
   pristine.addValidator(commentInputElement, validateComment, ErrorMessages.COMMENT_LENGTH, 1, false);
-
-  // !!! ДОБАВЛЯЕМ ОБРАБОТЧИКИ INPUT ДЛЯ ПЕРЕСЧЕТА ВАЛИДАЦИИ СРАЗУ !!!
-  // Это нужно, чтобы Pristine знал актуальное состояние поля при быстром тестировании
-  // Привязываем обработчик события 'input' к полю ввода хэштегов.
-  // Событие 'input' срабатывает немедленно при любом изменении содержимого поля.
   hashtagInputElement.addEventListener('input', () => {
-    // Внутри обработчика мы вручную вызываем метод validate() библиотеки Pristine.
-    // Это заставляет Pristine пересчитать валидацию конкретно для этого поля
-    // в реальном времени, при каждом нажатии клавиши или очистке поля.
     pristine.validate(hashtagInputElement);
   });
   commentInputElement.addEventListener('input', () => {

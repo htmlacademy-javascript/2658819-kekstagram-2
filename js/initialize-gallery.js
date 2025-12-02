@@ -16,9 +16,6 @@ const initializeGallery = (photosData) => {
 
       if (selectedPhotoData) {
         renderBigPicture(selectedPhotoData);
-      } else {
-        /* eslint-disable no-console */
-        console.error('Данные для выбранной фотографии не найдены!');
       }
     }
   });
