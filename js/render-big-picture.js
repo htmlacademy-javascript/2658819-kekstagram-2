@@ -18,14 +18,16 @@ const commentFragment = document.createDocumentFragment();
 let commentsCount = COMMENTS_STEP;
 let currentComments = [];
 let isBigPictureActive = false;
+// eslint-disable-next-line prefer-const
+let handleLoadCommentsButtonClick;
 
 /**
  * Функция переключения видимости модального окна и скролла фона.
  */
-function toggleModal() {
+const toggleModal = () => {
   toggleClass(bigPicture, 'hidden');
   toggleClass(document.body, 'modal-open');
-}
+};
 
 /**
  * Создает новый элемент комментария на основе шаблона и данных комментария.
@@ -43,7 +45,7 @@ const createComment = (comment) => {
  * Отрисовывает и отображает комментарии для текущей большой фотографии.
  * Показывает комментарии порциями (по 5 штук) и управляет видимостью кнопки "Загрузить еще".
  */
-function renderComments() {
+const renderComments = () => {
   socialComments.replaceChildren();
 
   const displayedCount = Math.min(commentsCount, currentComments.length);
@@ -55,46 +57,47 @@ function renderComments() {
 
   if (displayedCount >= currentComments.length) {
     loadButton.classList.add('hidden');
-    loadButton.removeEventListener('click', onLoadCommentsButtonClick);
+    loadButton.removeEventListener('click', handleLoadCommentsButtonClick);
   } else {
     loadButton.classList.remove('hidden');
-    loadButton.addEventListener('click', onLoadCommentsButtonClick);
+    loadButton.addEventListener('click', handleLoadCommentsButtonClick);
   }
 
   socialComments.appendChild(commentFragment);
-}
-
-/**
- * Создает новый элемент комментария на основе шаблона и данных комментария.
- */
-function show(picture) {
-  const {url, likes, description} = picture;
-  bigPictureImg.src = url;
-  likesCount.textContent = likes;
-  pictureCaption.textContent = description;
-}
-
-/**
- * Закрывает модальное окно полноразмерного просмотра фотографии (Big Picture).
- * Сбрасывает счетчик комментариев, удаляет обработчик события с кнопки закрытия
- * и обновляет глобальное состояние активности окна.
- */
-function closeBigPicture() {
-  commentsCount = COMMENTS_STEP;
-  closeButton.removeEventListener ('click', closeBigPicture);
-  toggleModal();
-  isBigPictureActive = false;
-}
+};
 
 /**
  * Обработчик события клика по кнопке "Загрузить еще комментарии".
  * Увеличивает счетчик отображаемых комментариев на заданный шаг
  * и повторно вызывает функцию отрисовки комментариев.
  */
-function onLoadCommentsButtonClick() {
+handleLoadCommentsButtonClick = () => {
   commentsCount += COMMENTS_STEP;
   renderComments();
-}
+};
+
+/**
+ * Создает новый элемент комментария на основе шаблона и данных комментария.
+ */
+const show = (picture) => {
+  const {url, likes, description} = picture;
+  bigPictureImg.src = url;
+  likesCount.textContent = likes;
+  pictureCaption.textContent = description;
+};
+
+/**
+ * Закрывает модальное окно полноразмерного просмотра фотографии (Big Picture).
+ * Сбрасывает счетчик комментариев, удаляет обработчик события с кнопки закрытия
+ * и обновляет глобальное состояние активности окна.
+ */
+const handleCloseBigPictureClick = () => {
+  commentsCount = COMMENTS_STEP;
+  closeButton.removeEventListener ('click', handleCloseBigPictureClick);
+  loadButton.removeEventListener('click', handleLoadCommentsButtonClick);
+  toggleModal();
+  isBigPictureActive = false;
+};
 
 /**
  * Открывает модальное окно полноразмерного просмотра фотографии (Big Picture).
@@ -103,22 +106,20 @@ function onLoadCommentsButtonClick() {
  *
  * @param {object} picture - Объект фотографии, которую нужно отобразить.
  */
-function renderBigPicture(picture) {
+const renderBigPicture = (picture) => {
   currentComments = picture.comments.slice();
   show(picture);
   renderComments();
-  closeButton.addEventListener ('click', closeBigPicture);
+  closeButton.addEventListener ('click', handleCloseBigPictureClick);
   toggleModal();
   isBigPictureActive = true;
-}
+};
 
 /**
  * Проверяет, активно ли в данный момент модальное окно большой фотографии.
  *
  * @returns {boolean} True, если окно открыто, иначе false.
  */
-function getIsBigPictureActive() {
-  return isBigPictureActive;
-}
+const getIsBigPictureActive = () => isBigPictureActive;
 
-export { renderBigPicture, closeBigPicture, getIsBigPictureActive };
+export { renderBigPicture, handleCloseBigPictureClick, getIsBigPictureActive };

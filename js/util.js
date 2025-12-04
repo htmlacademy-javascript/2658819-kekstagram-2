@@ -12,20 +12,6 @@ const Keys = {
 
 const isEscapeKey = (evt) => evt.key === Keys.ESCAPE || evt.key === Keys.ESC;
 
-const closeOnEscKeyDown = (evt, cb) => {
-  if (isEscapeKey(evt)) {
-    cb();
-  }
-};
-
-/**
- * Склоняет существительное в зависимости от числительного (например, 1 комментарий, 2 комментария, 5 комментариев).
- * @param {number} num Число, определяющее форму склонения.
- * @param {string} nominative Именительный падеж (например, "комментарий").
- * @param {string} genitiveSingular Родительный падеж, единственное число (например, "комментария").
- * @param {string} genitivePlural Родительный падеж, множественное число (например, "комментариев").
- * @returns {string} Правильная форма слова.
- */
 const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
   if (num % 100 >= 11 && num % 100 <= 14) {
     return genitivePlural;
@@ -42,12 +28,6 @@ const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
   }
 };
 
-/**
-* Выбирает N уникальных случайных элементов из массива.
-* @param {Array<Object>} array Исходный массив
-* @param {number} count Количество уникальных элементов для выбора
-* @returns {Array<Object>} Новый массив с уникальными случайными элементами
-*/
 const getUniqueRandomElements = (array, count) => {
   const uniqueRandomElements = new Set();
   const arrayCopy = array.slice();
@@ -59,10 +39,6 @@ const getUniqueRandomElements = (array, count) => {
   return Array.from(uniqueRandomElements);
 };
 
-/**
- * Устранение дребезга (Debounce).
- * Запускает функцию только через timeout после последнего вызова.
- */
 const debounce = (callback, timeoutDelay) => {
   let timeoutId;
   return (...rest) => {
@@ -73,7 +49,6 @@ const debounce = (callback, timeoutDelay) => {
 
 export {
   toggleClass,
-  closeOnEscKeyDown,
   numDecline,
   isEscapeKey,
   getUniqueRandomElements,

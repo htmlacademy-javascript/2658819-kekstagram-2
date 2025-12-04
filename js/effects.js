@@ -12,6 +12,15 @@ let currentEffect = EFFECTS_CONFIG.none;
 let sliderInstance = null;
 
 /**
+ * Применяет выбранный эффект к изображению через CSS-класс.
+ */
+const applyEffect = () => {
+  const effectName = currentEffect.name;
+  imagePreviewElement.className = '';
+  imagePreviewElement.classList.add(`effects__preview--${effectName}`);
+};
+
+/**
  * Обновляет CSS-фильтр изображения и скрытое поле значения.
  * @param {number} value Текущее значение слайдера.
  */
@@ -28,7 +37,7 @@ const updateEffect = (value) => {
 /**
  * Обработчик события 'update' слайдера noUiSlider.
  */
-const onSliderUpdate = () => {
+const handleSliderUpdate = () => {
   const sliderValue = sliderInstance.get();
   updateEffect(parseFloat(sliderValue));
 };
@@ -51,14 +60,16 @@ const updateSliderConfig = () => {
     step: currentEffect.step,
     connect: 'lower',
     format: {
+      // eslint-disable-next-line func-names
       to: (value) => value,
+      // eslint-disable-next-line func-names
       from: (value) => parseFloat(value),
     },
   };
 
   if (sliderInstance === null) {
     sliderInstance = noUiSlider.create(effectLevelSlider, options);
-    sliderInstance.on('update', onSliderUpdate);
+    sliderInstance.on('update', handleSliderUpdate);
   } else {
     sliderInstance.updateOptions(options);
   }
@@ -67,9 +78,10 @@ const updateSliderConfig = () => {
 /**
  * Обработчик изменения радиокнопок эффектов.
  */
-const onEffectsChange = (evt) => {
+const handleEffectsChange = (evt) => {
   const newEffectName = evt.target.value;
   currentEffect = EFFECTS_CONFIG[newEffectName];
+  applyEffect();
   updateSliderConfig();
 };
 
@@ -79,16 +91,18 @@ const onEffectsChange = (evt) => {
  */
 const initializeEffects = () => {
   currentEffect = EFFECTS_CONFIG.none;
+  applyEffect();
   updateSliderConfig();
-  effectsListElement.addEventListener('change', onEffectsChange);
+  effectsListElement.addEventListener('change', handleEffectsChange);
 };
 
 /**
  * Сбрасывает эффекты и удаляет обработчики при закрытии формы.
  */
 const resetEffects = () => {
-  effectsListElement.removeEventListener('change', onEffectsChange);
+  effectsListElement.removeEventListener('change', handleEffectsChange);
   imagePreviewElement.style.filter = '';
+  imagePreviewElement.className = '';
   if (sliderInstance) {
     sliderInstance.destroy();
     sliderInstance = null;
