@@ -47,13 +47,14 @@ const sendData = (formData) =>
     method: 'POST',
     body: formData,
   })
-    // Используется неявный возврат результата тернарного оператора
-    .then((response) =>
-      !response.ok
-        ? Promise.reject(new Error(`Ошибка отправки данных: ${response.status} ${response.statusText}`))
-        : response
-    )
-    .catch(() => {
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ошибка отправки данных: ${response.status} ${response.statusText}`);
+      }
+      return response;
+    })
+    .catch((error) => {
+      throw error;
     });
 
 export { loadData, sendData };

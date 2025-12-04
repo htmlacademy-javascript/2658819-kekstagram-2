@@ -6,70 +6,63 @@ const MAX_SCALE = 100; // Максимальный масштаб в проце�
 const DEFAULT_SCALE = 100; // Масштаб по умолчанию
 
 // --- DOM элементы ---
-const scaleControlSmaller = document.querySelector('.scale__control--smaller');
-const scaleControlBigger = document.querySelector('.scale__control--bigger');
+const smallerButton = document.querySelector('.scale__control--smaller');
+const biggerButton = document.querySelector('.scale__control--bigger');
 const scaleControlValue = document.querySelector('.scale__control--value');
 const imagePreviewElement = document.querySelector('.img-upload__preview img');
 
 /**
- * Применяет CSS-трансформацию масштабирования к изображению
- * и обновляет текстовое поле ввода формы.
- * @param {number} value Процент масштаба (например, 75).
+ * Устанавливает значение и атрибут value для элемента поля масштаба.
+ * @param {HTMLElement} element - Элемент поля ввода масштаба.
+ * @param {string} value - Форматированное строковое значение (например, "75%").
  */
-const applyScale = (value) => {
+const setValueAndAttribute = (element, value) => {
+  element.value = value;
+  element.setAttribute('value', value);
+};
+
+/**
+ * Обновляет масштаб изображения и значение в поле ввода.
+ * @param {number} value - Новый процент масштаба (25, 50, 75, 100).
+ */
+const updateScale = (value) => {
   const formattedValue = `${value}%`;
-  scaleControlValue.value = formattedValue;
-  scaleControlValue.setAttribute('value', formattedValue);
+  setValueAndAttribute(scaleControlValue, formattedValue);
   imagePreviewElement.style.transform = `scale(${value / 100})`;
 };
 
 /**
- * Обработчик кнопки "Уменьшить".
+ * Обработчик клика по кнопке уменьшения масштаба.
  */
-const onSmallerButtonClick = () => {
+const handleSmallerButtonClick = () => {
   const currentValue = parseInt(scaleControlValue.value, 10);
-
-  let newValue = currentValue - SCALE_STEP;
-  if (newValue < MIN_SCALE) {
-    newValue = MIN_SCALE;
-  }
-
-  applyScale(newValue);
+  const newValue = Math.max(MIN_SCALE, currentValue - SCALE_STEP);
+  updateScale(newValue);
 };
 
 /**
- * Обработчик кнопки "Увеличить".
+ * Обработчик клика по кнопке увеличения масштаба.
  */
-const onBiggerButtonClick = () => {
+const handleBiggerButtonClick = () => {
   const currentValue = parseInt(scaleControlValue.value, 10);
-
-  let newValue = currentValue + SCALE_STEP;
-  if (newValue > MAX_SCALE) {
-    newValue = MAX_SCALE;
-  }
-
-  applyScale(newValue);
-};
-
-
-/**
- * Инициализирует функционал масштабирования при открытии формы.
- * Устанавливает масштаб по умолчанию и добавляет обработчики событий.
- */
-const initializeScale = () => {
-  applyScale(DEFAULT_SCALE);
-  scaleControlSmaller.addEventListener('click', onSmallerButtonClick);
-  scaleControlBigger.addEventListener('click', onBiggerButtonClick);
+  const newValue = Math.min(MAX_SCALE, currentValue + SCALE_STEP);
+  updateScale(newValue);
 };
 
 /**
- * Сбрасывает обработчики и масштаб при закрытии модального окна,
- * предотвращая "утечку" слушателей событий.
+ * Сбрасывает масштаб изображения к значению по умолчанию (100%).
  */
 const resetScale = () => {
-  scaleControlSmaller.removeEventListener('click', onSmallerButtonClick);
-  scaleControlBigger.removeEventListener('click', onBiggerButtonClick);
-  // Визуальный сброс масштаба происходит в resetImageInputValue()
+  updateScale(DEFAULT_SCALE);
+};
+
+/**
+ * Инициализирует обработчики событий кнопок масштабирования
+ */
+const initializeScale = () => {
+  smallerButton.addEventListener('click', handleSmallerButtonClick);
+  biggerButton.addEventListener('click', handleBiggerButtonClick);
+  resetScale(); // Устанавливаем масштаб по умолчанию при открытии формы
 };
 
 export { initializeScale, resetScale };

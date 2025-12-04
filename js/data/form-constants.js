@@ -36,15 +36,14 @@ const EFFECTS_CONFIG = {
 };
 
 // --- Константы форматов файлов ---
-const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+const FILE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png'];
 
-// Экспортируем все константы, относящиеся к форме
 export {
   MAX_HASHTAG_COUNT,
   MAX_COMMENT_LENGTH,
   HASHTAG_REGEX,
   ErrorMessages,
   EFFECTS_CONFIG,
-  FILE_TYPES
+  FILE_EXTENSIONS
 };
 

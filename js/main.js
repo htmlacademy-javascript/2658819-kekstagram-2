@@ -1,14 +1,14 @@
 
 import { renderPhotos } from './render-photos.js';
-import { initializeUploadForm, closeModalHandler as closeUploadForm, isMessageActive, closeActiveMessage, isFocusOnInput } from './initialize-upload-form.js';
+import { initializeUploadForm, handleCloseUploadModalClick as closeUploadForm, isMessageActive, handleCloseActiveMessageClick as closeActiveMessage, isFocusOnInput } from './initialize-upload-form.js';
 import { initializeGallery } from './initialize-gallery.js';
 import { loadData } from './api.js';
 import { initializeFilters } from './initialize-filters.js';
-import { closeBigPicture, getIsBigPictureActive } from './render-big-picture.js';
+import { handleCloseBigPictureClick as closeBigPicture, getIsBigPictureActive } from './render-big-picture.js';
 import { isEscapeKey } from './util.js';
 
 // !!! ЦЕНТРАЛЬНЫЙ ДИСПЕТЧЕР ESCAPE !!!
-document.addEventListener('keydown', (evt) => {
+const handleDocumentKeydown = (evt) => {
   if (isEscapeKey(evt)) {
     // 1. Приоритет #1: Активно ли сообщение (успех/ошибка)?
     if (isMessageActive()) {
@@ -36,13 +36,14 @@ document.addEventListener('keydown', (evt) => {
       evt.preventDefault();
     }
   }
-});
+};
 
+document.addEventListener('keydown', handleDocumentKeydown);
 
 /**
  * Функция инициализации приложения с использованием промисов
  */
-const init = () => {
+const initializeApp = () => {
   loadData()
     .then((photosData) => {
       renderPhotos(photosData);
@@ -55,5 +56,5 @@ const init = () => {
 };
 
 // --- Запуск приложения ---
-init();
+initializeApp();
 initializeUploadForm();
